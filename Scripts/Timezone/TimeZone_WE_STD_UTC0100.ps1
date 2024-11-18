@@ -1,1 +1,1 @@
- Set-TimeZone -Name 'W. Europe Standard Time' -PassThru
+ tzutil /s "W. Europe Standard Time"
