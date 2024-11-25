@@ -1,1 +1,4 @@
-cmd.exe /c tzutil /s "W. Europe Standard Time"
+try{ 
+  cmd.exe /c tzutil /s "W. Europe Standard Time"
+} 
+catch{}
