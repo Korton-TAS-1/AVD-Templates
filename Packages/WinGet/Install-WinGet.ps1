@@ -13,3 +13,6 @@ Add-AppxPackage Microsoft.UI.Xaml.2.8.x64.appx
 Add-AppxPackage Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle
 #>
 &([ScriptBlock]::Create((irm asheroto.com/winget))) -Force
+sleep 10
+Invoke-WebRequest -Uri https://cdn.winget.microsoft.com/cache/source.msix -OutFile $env:TEMP\source.msix
+Add-AppProvisionedPackage -online -packagepath $env:TEMP\source.msix -skiplicense
