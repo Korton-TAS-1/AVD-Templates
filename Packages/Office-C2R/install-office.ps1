@@ -10,8 +10,6 @@ if (!(Test-Path -Path $tempFolder)) {
    }
    Write-Host "AVD AIB Customization Office Apps : Created temp folder $tempFolder"
 
-
-
         $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
         Write-Host "Starting AVD AIB Customization : Office Apps : $((Get-Date).ToUniversalTime())"
 
@@ -22,7 +20,6 @@ if (!(Test-Path -Path $tempFolder)) {
             if ($XMLContent.StatusCode -ne 200) { 
                 throw "Could not access the Configuration XML file  $($XMLContent.StatusCode) ($($XMLContent.StatusDescription))"
             }
-
          
             $HttpContent = Invoke-WebRequest -Uri $ODTDownloadUrl -UseBasicParsing
             
@@ -89,8 +86,6 @@ if (!(Test-Path -Path $tempFolder)) {
             $PSCmdlet.ThrowTerminatingError($PSitem)
         }
 
-
-
         #Cleanup
         if ((Test-Path -Path $tempFolder -ErrorAction SilentlyContinue)) {
             Remove-Item -Path $tempFolder -Force -Recurse -ErrorAction Continue
@@ -103,6 +98,3 @@ if (!(Test-Path -Path $tempFolder)) {
         $stopwatch.Stop()
         $elapsedTime = $stopwatch.Elapsed
         Write-Host "Ending AVD AIB Customization : Office Apps - Time taken: $elapsedTime"
-
-
-
