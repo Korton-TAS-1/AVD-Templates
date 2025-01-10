@@ -17,7 +17,7 @@ if (!(Test-Path -Path $tempFolder)) {
 
         try {
             
-            $XMLContent = Invoke-WebRequest -Uri https://raw.githubusercontent.com/Korton-TAS-1/AVD-Office/main/XML/AVD32-Configuration-no-OneDrive.xml -UseBasicParsing
+            $XMLContent = Invoke-WebRequest -Uri https://raw.githubusercontent.com/Korton-TAS-1/AVD-Templates/refs/heads/main/Packages/Office-C2R/XML/AVD32-Configuration-no-OneDrive.xml -UseBasicParsing
 
             if ($XMLContent.StatusCode -ne 200) { 
                 throw "Could not access the Configuration XML file  $($XMLContent.StatusCode) ($($XMLContent.StatusDescription))"
