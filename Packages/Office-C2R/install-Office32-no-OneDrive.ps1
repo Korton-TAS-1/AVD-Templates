@@ -1,4 +1,4 @@
-﻿# download office deployment tool 
+# download office deployment tool 
 $ODTDownloadUrl = 'https://www.microsoft.com/en-us/download/details.aspx?id=49117'
 $ODTDownloadLinkRegex = '/officedeploymenttool[a-z0-9_-]*\.exe$'
 $guid = [guid]::NewGuid().Guid
@@ -17,23 +17,23 @@ if (!(Test-Path -Path $tempFolder)) {
 
         try {
             
-            $XMLContent = Invoke-WebRequest -Uri https://raw.githubusercontent.com/Korton-TAS-1/AVD-Templates/refs/heads/main/Packages/Office-C2R/XML/AVD32-Configuration-no-OneDrive.xml -UseBasicParsing
+            $XMLContent = Invoke-WebRequest -Uri https://raw.githubusercontent.com/Korton-TAS-1/AVD-Office/main/XML/AVD32-Configuration-no-OneDrive.xml -UseBasicParsing
 
             if ($XMLContent.StatusCode -ne 200) { 
                 throw "Could not access the Configuration XML file  $($XMLContent.StatusCode) ($($XMLContent.StatusDescription))"
             }
 
          
-            $HttpContent = Invoke-WebRequest -Uri $ODTDownloadUrl -UseBasicParsing
+            # $HttpContent = Invoke-WebRequest -Uri $ODTDownloadUrl -UseBasicParsing
             
-            if ($HttpContent.StatusCode -ne 200) { 
-                throw "Office Installation script failed to find Office deployment tool link -- Response $($HttpContent.StatusCode) ($($HttpContent.StatusDescription))"
-            }
+            # if ($HttpContent.StatusCode -ne 200) { 
+            #    throw "Office Installation script failed to find Office deployment tool link -- Response $($HttpContent.StatusCode) ($($HttpContent.StatusDescription))"
+            # }
 
-            $ODTDownloadLinks = $HttpContent.Links | Where-Object { $_.href -Match $ODTDownloadLinkRegex }
+            # $ODTDownloadLinks = $HttpContent.Links | Where-Object { $_.href -Match $ODTDownloadLinkRegex }
 
             #pick the first link in case there are multiple
-            $ODTToolLink = $ODTDownloadLinks[0].href
+            $ODTToolLink = "https://download.microsoft.com/download/2/7/A/27AF1BE6-DD20-4CB4-B154-EBAB8A7D4A7E/officedeploymenttool_18129-20158.exe"
             Write-Host "AVD AIB Customization Office Apps : Office deployment tool link is $ODTToolLink"
 
             $ODTexePath = Join-Path -Path $tempFolder -ChildPath "officedeploymenttool.exe"
@@ -103,5 +103,3 @@ if (!(Test-Path -Path $tempFolder)) {
         $stopwatch.Stop()
         $elapsedTime = $stopwatch.Elapsed
         Write-Host "Ending AVD AIB Customization : Office Apps - Time taken: $elapsedTime"
-
-
