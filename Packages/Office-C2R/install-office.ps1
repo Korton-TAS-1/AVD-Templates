@@ -1,5 +1,5 @@
 ﻿# download office deployment tool 
-$ODTDownloadUrl = 'https://www.microsoft.com/en-us/download/details.aspx?id=49117'
+$ODTDownloadUrl = 'https://go.microsoft.com/fwlink/p/?LinkID=626065'
 $ODTDownloadLinkRegex = '/officedeploymenttool[a-z0-9_-]*\.exe$'
 $guid = [guid]::NewGuid().Guid
 $tempFolder = (Join-Path -Path "C:\temp\" -ChildPath $guid)
