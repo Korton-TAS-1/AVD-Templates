@@ -15,88 +15,79 @@ if (!(Test-Path -Path $tempFolder)) {
         Write-Host "Starting AVD AIB Customization : Office Apps : $((Get-Date).ToUniversalTime())"
 
         try {
-            
-            $XMLContent = Invoke-WebRequest -Uri https://raw.githubusercontent.com/Korton-TAS-1/AVD-Templates/refs/heads/main/Packages/Office-C2R/XML/AVD32-Configuration-no-OneDrive.xml -UseBasicParsing
+			# Download XML configuration file
+			$XMLUri = "https://raw.githubusercontent.com/Korton-TAS-1/AVD-Templates/refs/heads/main/Packages/Office-C2R/XML/AVD32-Configuration-no-OneDrive.xml"
+			$XMLContent = Invoke-WebRequest -Uri $XMLUri -UseBasicParsing
+			
+			if ($XMLContent.StatusCode -ne 200) {
+				throw "Error: Unable to access Configuration XML file. Status Code: $($XMLContent.StatusCode), Description: $($XMLContent.StatusDescription)"
+			}
 
-            if ($XMLContent.StatusCode -ne 200) { 
-                throw "Could not access the Configuration XML file  $($XMLContent.StatusCode) ($($XMLContent.StatusDescription))"
-            }
+			# Download Office Deployment Tool
+			$HttpContent = Invoke-WebRequest -Uri $ODTDownloadUrl -UseBasicParsing
+			
+			if ($HttpContent.StatusCode -ne 200) {
+				throw "Error: Failed to retrieve Office Deployment Tool link. Status Code: $($HttpContent.StatusCode), Description: $($HttpContent.StatusDescription)"
+			}
 
-         
-            $HttpContent = Invoke-WebRequest -Uri $ODTDownloadUrl -UseBasicParsing
-            
-            if ($HttpContent.StatusCode -ne 200) { 
-                throw "Office Installation script failed to find Office deployment tool link -- Response $($HttpContent.StatusCode) ($($HttpContent.StatusDescription))"
-            }
+			$ODTDownloadLinks = $HttpContent.Links | Where-Object { $_.href -match $ODTDownloadLinkRegex }
+			$ODTToolLink = $ODTDownloadLinks[0].href
+			Write-Host "Office Deployment Tool link retrieved: $ODTToolLink"
 
-            $ODTDownloadLinks = $HttpContent.Links | Where-Object { $_.href -Match $ODTDownloadLinkRegex }
+			$ODTexePath = Join-Path -Path $tempFolder -ChildPath "officedeploymenttool.exe"
 
-            #pick the first link in case there are multiple
-            $ODTToolLink = $ODTDownloadLinks[0].href
-            Write-Host "AVD AIB Customization Office Apps : Office deployment tool link is $ODTToolLink"
+			# Download ODT tool
+			Write-Host "Downloading Office Deployment Tool to $ODTexePath"
+			$ODTResponse = Invoke-WebRequest -Uri $ODTToolLink -UseBasicParsing -OutFile $ODTexePath -PassThru
 
-            $ODTexePath = Join-Path -Path $tempFolder -ChildPath "officedeploymenttool.exe"
+			if ($ODTResponse.StatusCode -ne 200) {
+				throw "Error: Failed to download Office Deployment Tool. Status Code: $($ODTResponse.StatusCode), Description: $($ODTResponse.StatusDescription)"
+			}
 
-            #download office deployment tool
+			# Extract setup.exe
+			Write-Host "Extracting Office Deployment Tool to $tempFolder"
+			Start-Process -FilePath $ODTexePath -ArgumentList "/extract:`"$($tempFolder)`" /quiet" -Wait -NoNewWindow -ErrorAction Stop
 
-            Write-Host "AVD AIB Customization Office Apps : Downloading ODT tool into folder $ODTexePath"
-            $ODTResponse = Invoke-WebRequest -Uri "$ODTToolLink" -UseBasicParsing -UseDefaultCredentials -OutFile $ODTexePath -PassThru
+			$setupExePath = Join-Path -Path $tempFolder -ChildPath 'setup.exe'
+			$xmlFilePath = Join-Path -Path $tempFolder -ChildPath 'installOffice.xml'
 
-            if ($ODTResponse.StatusCode -ne 200) { 
-                throw "Office Installation script failed to download Office deployment tool -- Response $($ODTResponse.StatusCode) ($($ODTResponse.StatusDescription))"
-            }
+			# Save XML content
+			Write-Host "Saving XML configuration to $xmlFilePath"
+			$XMLContent.Content | Out-File -FilePath $xmlFilePath -Force -Encoding Ascii
 
-            Write-Host "AVD AIB Customization Office Apps : Extracting setup.exe into $tempFolder"
-            # extract setup.exe
-            Start-Process -FilePath $ODTexePath -ArgumentList "/extract:`"$($tempFolder)`" /quiet" -PassThru -Wait -NoNewWindow
+			# Download Office using setup.exe
+			Write-Host "Downloading Office components using $setupExePath"
+			$ODTRunSetupExe = Start-Process -FilePath $setupExePath -ArgumentList "/download $(Split-Path -Path $xmlFilePath -Leaf)" -Wait -PassThru -WorkingDirectory $tempFolder -WindowStyle Hidden
 
-            $setupExePath = Join-Path -Path $tempFolder -ChildPath 'setup.exe'
-            
-            # Construct XML config file for Office Deployment Kit setup.exe
-            $xmlFilePath = Join-Path -Path $tempFolder -ChildPath 'installOffice.xml'
+			if ($ODTRunSetupExe.ExitCode -ne 0) {
+				throw "Error: Setup.exe returned exit code $($ODTRunSetupExe.ExitCode) while downloading Office components."
+			}
 
-            Write-Host "AVD AIB Customization Office Apps : Saving xml content into xml file : $xmlFilePath"
-            
-            $XMLContent.Content | Out-File -FilePath $xmlFilePath -Force -Encoding ascii
-            
-            [XML]$file = Get-Content $xmlFilePath
-            
-            Write-Host "AVD AIB Customization Office Apps : Running setup.exe to download Office"
-            $ODTRunSetupExe = Start-Process -FilePath $setupExePath -ArgumentList "/download $(Split-Path -Path $xmlFilePath -Leaf)" -PassThru -Wait -WorkingDirectory $tempFolder -WindowStyle Hidden
+			# Install Office
+			Write-Host "Installing Office using $setupExePath"
+			$InstallOffice = Start-Process -FilePath $setupExePath -ArgumentList "/configure $(Split-Path -Path $xmlFilePath -Leaf)" -Wait -PassThru -WorkingDirectory $tempFolder -WindowStyle Hidden
 
-            if (!$ODTRunSetupExe) {
-                Throw "AVD AIB Customization Office Apps : Failed to run `"$setupExePath`" to download Office"
-            }
+			if ($InstallOffice.ExitCode -ne 0) {
+				throw "Error: Setup.exe returned exit code $($InstallOffice.ExitCode) while installing Office."
+			}
 
-            if ( $ODTRunSetupExe.ExitCode) {
-                Throw "AVD AIB Customization Office Apps : Exit code $($ODTRunSetupExe.ExitCode) returned from `"$setupExePath`" to download Office"
-            }
+			Write-Host "Office installation completed successfully."
 
-            Write-Host "AVD AIB Customization Office Apps : Running setup.exe to Install Office"
-            $InstallOffice = Start-Process -FilePath $setupExePath -ArgumentList "/configure $(Split-Path -Path $xmlFilePath -Leaf)" -PassThru -Wait -WorkingDirectory $tempFolder -WindowStyle Hidden
-
-            if (!$InstallOffice) {
-                Throw "AVD AIB Customization Office Apps : Failed to run `"$setupExePath`" to install Office"
-            }
-
-            if ( $ODTRunSetupExe.ExitCode ) {
-                Throw "AVD AIB Customization Office Apps : Exit code $($ODTRunSetupExe.ExitCode) returned from `"$setupExePath`" to download Office"
-            }
-            
-        }
-        catch {
-            $PSCmdlet.ThrowTerminatingError($PSitem)
-        }
+		} catch {
+			Write-Error "An error occurred: $($_.Exception.Message)"
+			$PSCmdlet.ThrowTerminatingError($_)
+		}
 
         #Cleanup
         if ((Test-Path -Path $tempFolder -ErrorAction SilentlyContinue)) {
-            Remove-Item -Path $tempFolder -Force -Recurse -ErrorAction Continue
+            #Remove-Item -Path $tempFolder -Force -Recurse -ErrorAction Continue
         }
 
         if ((Test-Path -Path $templateFilePathFolder -ErrorAction SilentlyContinue)) {
-            Remove-Item -Path $templateFilePathFolder -Force -Recurse -ErrorAction Continue
+            #Remove-Item -Path $templateFilePathFolder -Force -Recurse -ErrorAction Continue
         }
 
         $stopwatch.Stop()
         $elapsedTime = $stopwatch.Elapsed
         Write-Host "Ending AVD AIB Customization : Office Apps - Time taken: $elapsedTime"
+
