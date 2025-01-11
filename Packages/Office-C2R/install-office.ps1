@@ -18,7 +18,7 @@ if (!(Test-Path -Path $tempFolder)) {
 			# Download XML configuration file
 			$XMLUri = "https://raw.githubusercontent.com/Korton-TAS-1/AVD-Templates/refs/heads/main/Packages/Office-C2R/XML/AVD-Configuration.xml"
 			$XMLContent = Invoke-WebRequest -Uri $XMLUri -UseBasicParsing
-
+			
 			if ($XMLContent.StatusCode -ne 200) {
 				throw "Error: Unable to access Configuration XML file. Status Code: $($XMLContent.StatusCode), Description: $($XMLContent.StatusDescription)"
 			}
@@ -65,7 +65,7 @@ if (!(Test-Path -Path $tempFolder)) {
 
 			# Install Office
 			Write-Host "Installing Office using $setupExePath"
-			#$InstallOffice = Start-Process -FilePath $setupExePath -ArgumentList "/configure $(Split-Path -Path $xmlFilePath -Leaf)" -Wait -PassThru -WorkingDirectory $tempFolder -WindowStyle Hidden
+			$InstallOffice = Start-Process -FilePath $setupExePath -ArgumentList "/configure $(Split-Path -Path $xmlFilePath -Leaf)" -Wait -PassThru -WorkingDirectory $tempFolder -WindowStyle Hidden
 
 			if ($InstallOffice.ExitCode -ne 0) {
 				throw "Error: Setup.exe returned exit code $($InstallOffice.ExitCode) while installing Office."
@@ -77,7 +77,6 @@ if (!(Test-Path -Path $tempFolder)) {
 			Write-Error "An error occurred: $($_.Exception.Message)"
 			$PSCmdlet.ThrowTerminatingError($_)
 		}
-
         #Cleanup
         if ((Test-Path -Path $tempFolder -ErrorAction SilentlyContinue)) {
             #Remove-Item -Path $tempFolder -Force -Recurse -ErrorAction Continue
