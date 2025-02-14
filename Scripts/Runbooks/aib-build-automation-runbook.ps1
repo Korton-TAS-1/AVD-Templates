@@ -85,6 +85,23 @@ try
 		Write-Output "$TemplateName | $TemplateResourceGroupName | Image Template build initiated with new Marketplace Image Version or current image older than 31 days."
 		Start-AzImageBuilderTemplate -ResourceGroupName $TemplateResourceGroupName -Name $TemplateName
 		Write-Output "$TemplateName | $TemplateResourceGroupName | Image Template build succeeded. New Image Version available in Compute Gallery."
+		
+		#Remove the older image versions from the gallery except last 2 versions
+		$imagegallery = Get-AzGallery
+		$imagegallerydefinitioninfo = Get-AzGalleryImageDefinition -GalleryName $imagegallery.Name -ResourceGroupName $imagegallery.ResourceGroupName
+		$imagegalleryinfo = Get-AzGalleryImageVersion -GalleryName $imagegallery.Name -ResourceGroupName $imagegallery.ResourceGroupName -GalleryImageDefinitionName $imagegallerydefinitioninfo.Name
+		$sortedImageVersions = $imagegalleryinfo | Sort-Object -Property Name
+		
+		# Sort the image versions by name (assuming the name contains version information that sorts correctly)
+		$sortedImageVersions = $imagegalleryinfo | Sort-Object -Property Name
+		# Skip the latest 2 versions and remove the rest
+		$versionsToRemove = $sortedImageVersions | Select-Object -SkipLast 2
+
+		foreach ($imageversion in $versionsToRemove)
+		{
+			Write-Output "Removing $($imageversion.name) from $($imagegallerydefinitioninfo.Name)"
+			Remove-AzGalleryImageVersion -GalleryName $imagegallery.Name -GalleryImageDefinitionName $imagegallerydefinitioninfo.Name -Name $imageversion.Name -ResourceGroupName $imageversion.ResourceGroupName -force -AsJob
+		}
 	}
 	else 
 	{
