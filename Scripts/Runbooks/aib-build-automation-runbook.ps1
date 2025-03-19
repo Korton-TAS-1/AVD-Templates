@@ -90,12 +90,11 @@ try
 		$imagegallery = Get-AzGallery
 		$imagegallerydefinitioninfo = Get-AzGalleryImageDefinition -GalleryName $imagegallery.Name -ResourceGroupName $imagegallery.ResourceGroupName
 		$imagegalleryinfo = Get-AzGalleryImageVersion -GalleryName $imagegallery.Name -ResourceGroupName $imagegallery.ResourceGroupName -GalleryImageDefinitionName $imagegallerydefinitioninfo.Name
-		$sortedImageVersions = $imagegalleryinfo | Sort-Object -Property Name
 		
 		# Sort the image versions by name (assuming the name contains version information that sorts correctly)
-		$sortedImageVersions = $imagegalleryinfo | Sort-Object -Property Name
-		# Skip the latest 2 versions and remove the rest
-		$versionsToRemove = $sortedImageVersions | Select-Object -SkipLast 2
+		$sortedImageVersions = $imagegalleryinfo | Sort-Object {$_.PublishingProfile.PublishedDate} -Descending
+		# Keep the first 2 versions and remove the rest
+		$versionsToRemove = $sortedImageVersions | Select-Object -Skip 2
 
 		foreach ($imageversion in $versionsToRemove)
 		{
