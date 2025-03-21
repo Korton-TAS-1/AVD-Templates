@@ -99,7 +99,7 @@ try
 		foreach ($imageversion in $versionsToRemove)
 		{
 			Write-Output "Removing $($imageversion.name) from $($imagegallerydefinitioninfo.Name)"
-			Remove-AzGalleryImageVersion -GalleryName $imagegallery.Name -GalleryImageDefinitionName $imagegallerydefinitioninfo.Name -Name $imageversion.Name -ResourceGroupName $imageversion.ResourceGroupName -force -AsJob
+			Remove-AzGalleryImageVersion -GalleryName $imagegallery.Name -GalleryImageDefinitionName $imagegallerydefinitioninfo.Name -Name $imageversion.Name -ResourceGroupName $imageversion.ResourceGroupName -force
 		}
 	}
 	else 
