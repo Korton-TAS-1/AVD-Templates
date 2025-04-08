@@ -1,8 +1,8 @@
-# Download WindowsApp from Microsoft
-$myDownloadUrl="https://go.microsoft.com/fwlink/?linkid=2262633"
+$ResolveWingetPath = Resolve-Path "C:\Program Files\WindowsApps\Microsoft.DesktopAppInstaller_*_x64__8wekyb3d8bbwe\winget.exe"
+    if ($ResolveWingetPath){
+           $WingetPath = $ResolveWingetPath[-1].Path
+    }
 
-mkdir c:\temp -f
-Invoke-WebRequest $myDownloadUrl -OutFile c:\temp\WindowsApp_x64.msix
-
-# Install WindowsApp for all users
-Add-AppProvisionedPackage -online -packagepath "c:\temp\WindowsApp_x64.msix" -skiplicense
+$Wingetpath = Split-Path -Path $WingetPath -Parent
+cd $wingetpath
+.\winget.exe install --exact --id Microsoft.DotNet.SDK.8 --silent --accept-package-agreements --accept-source-agreements
