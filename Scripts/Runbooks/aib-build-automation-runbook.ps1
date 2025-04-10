@@ -80,9 +80,9 @@ try
 		throw
 	}
 	# If the latest Marketplace Image Version was released after the last AIB Image Template build then trigger a new AIB Image Template build
-	elseif($ImageVersionDate -gt $ImageBuildDate -or (New-TimeSpan -Start $ImageVersionDate -End (Get-Date)).Days -gt 31)
+	elseif($ImageVersionDate -gt $ImageBuildDate -or (New-TimeSpan -Start $ImageVersionDate -End (Get-Date)).Days -gt 35)
 	{   
-		Write-Output "$TemplateName | $TemplateResourceGroupName | Image Template build initiated with new Marketplace Image Version or current image older than 31 days."
+		Write-Output "$TemplateName | $TemplateResourceGroupName | Image Template build initiated with new Marketplace Image Version or current image older than 35 days."
 		Start-AzImageBuilderTemplate -ResourceGroupName $TemplateResourceGroupName -Name $TemplateName
 		Write-Output "$TemplateName | $TemplateResourceGroupName | Image Template build succeeded. New Image Version available in Compute Gallery."
 		
