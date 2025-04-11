@@ -1,3 +1,6 @@
+.\winget install -s msstore --id 9NBLGGH4NNS1 --silent --accept-package-agreements --accept-source-agreements --force
+shutdown -r -t 0
+
 <#https://learn.microsoft.com/en-us/windows/package-manager/winget/
 $progressPreference = 'silentlyContinue'
 Write-Information "Downloading WinGet and its dependencies..."
@@ -11,8 +14,9 @@ Add-AppxProvisionedPackage -Online Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.m
 Add-AppxPackage Microsoft.VCLibs.x64.14.00.Desktop.appx
 Add-AppxPackage Microsoft.UI.Xaml.2.8.x64.appx
 Add-AppxPackage Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle
-#>
+
 &([ScriptBlock]::Create((irm asheroto.com/winget))) -Force
 sleep 10
 Invoke-WebRequest -Uri https://cdn.winget.microsoft.com/cache/source.msix -OutFile $env:TEMP\source.msix
 Add-AppProvisionedPackage -online -packagepath $env:TEMP\source.msix -skiplicense
+#>
