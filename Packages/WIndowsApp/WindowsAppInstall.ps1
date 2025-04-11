@@ -1,3 +1,4 @@
+Write-Host "Installing WindowsApp: "
 # Download WindowsApp from Microsoft
 $myDownloadUrl="https://go.microsoft.com/fwlink/?linkid=2262633"
 
