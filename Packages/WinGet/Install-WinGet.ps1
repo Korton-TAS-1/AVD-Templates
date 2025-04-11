@@ -1,5 +1,4 @@
 .\winget install -s msstore --id 9NBLGGH4NNS1 --silent --accept-package-agreements --accept-source-agreements --force
-shutdown -r -t 0
 
 <#https://learn.microsoft.com/en-us/windows/package-manager/winget/
 $progressPreference = 'silentlyContinue'
