@@ -373,7 +373,7 @@
                             "name": "[concat(parameters('vmName'), '/Microsoft.Insights/DCRAssociation')]",
                             "properties": {
                                 "description": "Association of data collection rule. Deleting this association will break the data collection for this virtual machine.",
-                                "dataCollectionRuleId": "/subscriptions/840522e5-189f-4007-9b19-5af6adbe01e0/resourceGroups/rg-avd-a1-prod-we-service-objects/providers/Microsoft.Insights/dataCollectionRules/microsoft-avdi-westeurope"
+                                "dataCollectionRuleId": "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/rg-avd-a1-prod-we-service-objects/providers/Microsoft.Insights/dataCollectionRules/microsoft-avdi-westeurope"
                             },
                             "dependsOn": [
                                 "[resourceId('Microsoft.Compute/virtualMachines', parameters('VMName'))]"
