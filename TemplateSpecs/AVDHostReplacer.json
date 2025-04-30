@@ -349,7 +349,7 @@
                             "condition": "[equals(parameters('DomainJoinObject').DomainType, 'ActiveDirectory')]",
                             "type": "Microsoft.Compute/virtualMachines/extensions",
                             "apiVersion": "2023-09-01",
-                            "name": "[concat(parameters('vmName'), '/CustomScriptExtension')]",
+                            "name": "[concat(parameters('VMName'), '/CustomScriptExtension')]",
                             "location": "[parameters('location')]",
                             "properties": {
                                 "publisher": "Microsoft.Compute",
@@ -370,15 +370,17 @@
                         },
                         {
                             "type": "Microsoft.Compute/virtualMachines/providers/dataCollectionRuleAssociations",
-                            "name": "[concat(parameters('vmName'), '/Microsoft.Insights/DCRAssociation')]",
+                            "name": "[concat(parameters('VMName'), '/Microsoft.Insights/DCRAssociation')]",
+                            "apiVersion": "2021-04-01",
                             "properties": {
                                 "description": "Association of data collection rule. Deleting this association will break the data collection for this virtual machine.",
-                                "dataCollectionRuleId": "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/rg-avd-a1-prod-we-service-objects/providers/Microsoft.Insights/dataCollectionRules/microsoft-avdi-westeurope"
+                                "dataCollectionRuleId": "/subscriptions/XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX/resourceGroups/rg-avd-a1-prod-we-service-objects/providers/Microsoft.Insights/dataCollectionRules/microsoft-avdi-westeurope"
                             },
                             "dependsOn": [
                                 "[resourceId('Microsoft.Compute/virtualMachines', parameters('VMName'))]"
                             ]
                         },
+
                         {
                             "type": "Microsoft.Network/networkInterfaces",
                             "apiVersion": "2023-09-01",
