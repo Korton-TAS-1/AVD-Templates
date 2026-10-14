@@ -7,4 +7,4 @@ $ResolveWingetPath = Resolve-Path "C:\Program Files\WindowsApps\Microsoft.Deskto
 $Wingetpath = Split-Path -Path $WingetPath -Parent
 cd $wingetpath
 .\winget.exe install --exact --id Microsoft.DotNet.SDK.8 --silent --accept-package-agreements --accept-source-agreements
-.\winget.exe install --exact --id Microsoft.DotNet.DesktopRuntime.10 --silent --accept-package-agreements --accept-source-agreements
+.\winget.exe install --exact --id Microsoft.DotNet.DesktopRuntime.10.0.8 --silent --accept-package-agreements --accept-source-agreements
