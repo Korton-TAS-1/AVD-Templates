@@ -169,7 +169,8 @@ try {
             $headers = Get-StorageHeader -Id $ClientId
         }
         foreach ($pair in @(@($WcaMsiUrl, $wcaMsi), @($RdsMsiUrl, $rdsMsi))) {
-            Write-Log "Downloaden: $($pair[0])"
+            # Alleen het adres loggen, niet een eventuele SAS-token in de query string
+            Write-Log "Downloaden: $(($pair[0] -split '\?')[0])"
             Invoke-WebRequest -Uri $pair[0] -OutFile $pair[1] -UseBasicParsing -Headers $headers
         }
     }
